@@ -7,7 +7,7 @@ const port =  process.env.PORT || 3030;
 var txts;
 var resend;
 var kindOfQuery = "";
-var membCount = 0;
+var commentCount = 0;
 var contentIndex;
 
 const {MongoClient} = require('mongodb');
@@ -19,20 +19,13 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
  extended: true})); 
 app.use(cors())
 
-//You can use this to check if your server is working
-app.get('/SpeekersCorner', (req, res)=>{
-	  kindOfQuery = 'request';
-	  resend = res;
-	  requestGet().catch(console.error);
-})
-
 //Route that handles MeinungsSpiegel logic
 app.post('/SpeekersCorner', (req, res) =>{
-	kindOfQuery = 'deploy';
 	const data = req.body;
-	res.status(200).json({"Message": "Data posted", data});
+    resend = res;
 	txts = data.toString().split(",");
-    console.log(txts);
+    kindOfQuery = txts[0];
+    //console.log("-->-"+txts);
 	requestPost().catch(console.error);
 })
 
@@ -92,13 +85,19 @@ async function requestPost() {
 }
 
 function createDocument(id, arr) {
-        
+
+        var str = "", comma = ","
+        for(var x=4;x<arr.length;x++) {
+            if(x == arr.length -1) comma = "";
+
+            str = str+arr[x]+comma;
+        }
         var docu = {
                     _id: id,
-                    browserid: arr[0],
-                    lenguage: arr[1],
-                    deleteDate: arr[2],
-                    comment: arr[3];
+                    browserid: arr[1],
+                    lenguage: arr[2],
+                    deleteDate: arr[3],
+                    comment: str
            }
     return docu;
 }
@@ -109,22 +108,34 @@ function read_write_Comments (collection) {
        .countDocuments({})
        .then(
 	    (myCount) =>{
-	             membCount = myCount,
-		         if(kindOfQuery == 'deploy')
-                       await col.insertOne(createDocument((membCount +1), txts));
-                 else if(kindOfQuery == 'request') {
-                         await collection
-                 	       	  .find({}, {comment:1, _id:0});
-                 	       	  .then(
-                 	       	       res => contentIndex = res)
-                 	       	  );
-                         contentIndex[contentIndex.length] = ""+membCount;
-                         resend.status(200).json({"Message": "requestedIndex",  contentIndex});
-                              try {
-                                   await client.close();
-                              } catch (e) {}
-                      }
-			 }
+	             commentCount = myCount,
+		         dbEntrace(collection)
+		         }
 	   );
+}
+async function dbEntrace (collection) {
+
+    if(kindOfQuery == 'deploy') {
+       await collection.insertOne(createDocument((commentCount +1), txts));
+       resend.status(200).json({body: JSON.stringify("commentsCount: " + (commentCount +1))});
+    }
+    else if(kindOfQuery == 'request') {
+       var transfer ="";;
+       var list;
+       try {
+          await collection
+                  .deleteMany({ deleteDate: txts[3] });
+          await collection
+                .find({lenguage: txts[2]}, {comment:1, _id:0} )
+                .forEach(function(records){
+                          transfer =  transfer + "------------>"+ records.comment;
+                 })
+
+           resend.status(200).json({body: JSON.stringify(transfer)});
+         } catch (error) {
+           resend.status(400).json({ error: error });
+         }
+    }
+
 }
 
