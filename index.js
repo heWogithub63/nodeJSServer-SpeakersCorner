@@ -25,6 +25,7 @@ app.post('/SpeekersCorner', (req, res) =>{
     resend = res;
 	txts = data.toString().split(",");
     kindOfQuery = txts[0];
+
     //console.log("-->-"+txts);
 	requestPost().catch(console.error);
 })
@@ -122,6 +123,7 @@ async function dbEntrace (collection) {
     else if(kindOfQuery == 'request') {
        var transfer ="";;
        var list;
+
        try {
           await collection
                   .deleteMany({ $or: [ { deleteDate: Number(txts[3]) }, { deleteDate: { $lt: Number(txts[3]) } } ] });
