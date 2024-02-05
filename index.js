@@ -96,7 +96,7 @@ function createDocument(id, arr) {
                     _id: id,
                     browserid: arr[1],
                     lenguage: arr[2],
-                    deleteDate: arr[3],
+                    deleteDate: Number(arr[3]),
                     comment: str
            }
     return docu;
