@@ -124,7 +124,7 @@ async function dbEntrace (collection) {
        var list;
        try {
           await collection
-                  .deleteMany({ $or: [ { deleteDate: Number(txts[3) }, { deleteDate: { $lt: Number(txts[3]) } } ] });
+                  .deleteMany({ $or: [ { deleteDate: Number(txts[3]) }, { deleteDate: { $lt: Number(txts[3]) } } ] });
           await collection
                 .find({lenguage: txts[2]}, {comment:1, _id:0} )
                 .forEach(function(records){
