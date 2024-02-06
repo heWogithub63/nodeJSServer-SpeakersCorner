@@ -94,8 +94,8 @@ function createDocument(id, arr) {
             str = str+arr[x]+comma;
         }
         var docu = {
-                    _id: id,
-                    browserid: arr[1],
+                    //_id: id,
+                    browserid: id,
                     lenguage: arr[2],
                     deleteDate: Number(arr[3]),
                     comment: str
