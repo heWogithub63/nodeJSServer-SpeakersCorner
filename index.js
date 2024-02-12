@@ -87,15 +87,17 @@ async function requestPost() {
 
 function createDocument(id, arr) {
 
-        var str = "", comma = ","
+        var str = "", comma = ",", crDate =  arr[1].substring(arr[1].length -2) +"."+ arr[1].substring(arr[1].length -4,
+                                              arr[1].length -2) +"."+ arr[1].substring(0, arr[1].length -4);
         for(var x=4;x<arr.length;x++) {
             if(x == arr.length -1) comma = "";
 
             str = str+arr[x]+comma;
+
         }
         var docu = {
                     //_id: id,
-                    browserid: id,
+                    createdDate: crDate,
                     lenguage: arr[2],
                     deleteDate: Number(arr[3]),
                     comment: str
@@ -126,11 +128,12 @@ async function dbEntrace (collection) {
 
        try {
           await collection
-                  .deleteMany({ $or: [ { deleteDate: Number(txts[3]) }, { deleteDate: { $lt: Number(txts[3]) } } ] });
+                  .deleteMany({ $or: [ { deleteDate: Number(txts[1]) }, { deleteDate: { $lt: Number(txts[1]) } } ] });
           await collection
-                .find({lenguage: txts[2]}, {comment:1, _id:0} )
+                .find({lenguage: txts[2]}, {comment:1, _id:0, createdDate:1} )
                 .forEach(function(records){
-                          transfer =  transfer + "------------>"+ records.comment;
+                          transfer =  transfer +"\n\n"+ records.createdDate + "------------>"+ records.comment;
+
                  })
 
            resend.status(200).json({body: JSON.stringify(transfer)});
