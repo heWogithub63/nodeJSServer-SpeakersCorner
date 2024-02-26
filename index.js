@@ -123,8 +123,9 @@ async function dbEntrace (collection) {
        resend.status(200).json({body: JSON.stringify("commentsCount: " + (commentCount +1))});
     }
     else if(kindOfQuery == 'request') {
-       var transfer ="";;
+       var transfer ="";
        var list;
+       var i=0;
 
        try {
           await collection
@@ -132,8 +133,8 @@ async function dbEntrace (collection) {
           await collection
                 .find({lenguage: txts[2]}, {comment:1, _id:0, createdDate:1} )
                 .forEach(function(records){
-                          transfer =  transfer +"\n\n"+ records.createdDate + "------------>"+ records.comment;
-
+                          i++;
+                          transfer =  transfer + "------------>"+ records.comment + "------------>"+ "\n\nComment: "+i+" --> "+ records.createdDate;
                  })
 
            resend.status(200).json({body: JSON.stringify(transfer)});
